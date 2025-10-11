@@ -10,6 +10,8 @@ public class Coin : MonoBehaviour
     public Animator animator;
     public Collider colliderCoin;
 
+    public AudioSource audioMoneda;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -34,6 +36,7 @@ public class Coin : MonoBehaviour
             other.gameObject.GetComponent<ControladorPlayer>().contadorMonedas++;
             animator.SetTrigger("take");
             colliderCoin.enabled = false;
+            audioMoneda.Play();
         }
     }
 

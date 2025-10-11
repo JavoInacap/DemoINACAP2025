@@ -7,6 +7,7 @@ public class ControladorMeta : MonoBehaviour
 {
     public bool llegoPlayer = false;
     public int contadorFinal;
+    public AudioSource audioLlegada;
 
     // Start is called before the first frame update
     void Start()
@@ -31,6 +32,7 @@ public class ControladorMeta : MonoBehaviour
             llegoPlayer = true;
 
             contadorFinal = other.gameObject.GetComponent<ControladorPlayer>().contadorMonedas;
+            audioLlegada.Play();
         }
     }
 }
