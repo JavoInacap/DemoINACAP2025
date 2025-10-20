@@ -33,9 +33,18 @@ public class MenuInicioController : MonoBehaviour
     {
         audioMixer.SetFloat("ambientalVolumenAM", newAmbientalVolumen);
     }
-    
+
     public void CargaEscena(int indiceEscena)
     {
+        // SceneManager.LoadScene(indiceEscena);
+        StartCoroutine(_CargaEscena(indiceEscena));
+    }
+
+    IEnumerator _CargaEscena(int indiceEscena)
+    {
+        Debug.Log("ESPERARE A CARGAR LA ESCENA");
+        yield return new WaitForSeconds(3f);
+        Debug.Log("CARGANDO ESCENA");
         SceneManager.LoadScene(indiceEscena);
     }
 }

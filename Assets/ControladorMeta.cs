@@ -18,10 +18,10 @@ public class ControladorMeta : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (llegoPlayer == true)
-        {
-            Debug.Log("TERMINO LA PARTIDA. TOTAL DE MONEDAS = " + contadorFinal);
-        }
+        // if (llegoPlayer == true)
+        // {
+        //     Debug.Log("TERMINO LA PARTIDA. TOTAL DE MONEDAS = " + contadorFinal);
+        // }
     }
 
     void OnTriggerEnter(Collider other)
