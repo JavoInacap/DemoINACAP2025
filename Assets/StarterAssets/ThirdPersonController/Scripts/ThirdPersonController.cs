@@ -122,6 +122,44 @@ namespace StarterAssets
             }
         }
 
+        // ATRIBUTOS HECHOS EN CLASE
+        public bool estaAgachado = false;
+        // [SerializeField]
+        public InputActionReference inputAgacharse;
+        public SizePersonaje dePie;
+        public SizePersonaje agachado;
+
+        void OnEnable()
+        {
+            inputAgacharse.action.performed += Agacharse;
+        }
+
+        void OnDisable()
+        {
+            inputAgacharse.action.performed -= Agacharse;
+        }
+
+        private void Agacharse(InputAction.CallbackContext context)
+        {
+            Debug.Log("PRESIONE AGACHARSE");
+            if (Grounded == true)
+            {
+                estaAgachado = !estaAgachado;
+
+                // Entregamos la estructura agachado o dePie
+                // dependiendo del valor de 'estaAgachado'
+                EstablecerSize(estaAgachado == true ? agachado : dePie);
+                
+                _animator.SetBool("agacharse", estaAgachado);
+            }
+        }
+
+        public void EstablecerSize(SizePersonaje newSize)
+        {
+            _controller.height = newSize.altura;
+            _controller.radius = newSize.ancho;
+            _controller.center = newSize.centro;
+        }
 
         private void Awake()
         {
@@ -281,7 +319,7 @@ namespace StarterAssets
 
         private void JumpAndGravity()
         {
-            if (Grounded)
+            if (Grounded == true && estaAgachado == false)
             {
                 // reset the fall timeout timer
                 _fallTimeoutDelta = FallTimeout;
@@ -387,6 +425,14 @@ namespace StarterAssets
             {
                 AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
             }
+        }
+
+        [System.Serializable]
+        public struct SizePersonaje
+        {
+            public float altura;
+            public float ancho;
+            public Vector3 centro;
         }
     }
 }
