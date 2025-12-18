@@ -16,6 +16,10 @@ namespace StarterAssets
 #endif
     public class ThirdPersonControllerARPG : MonoBehaviour
     {
+        //////////////////////////////////////////////////////////////////////////////////
+        
+        #region PARAMETROS
+
         [Header("Player")]
         [Tooltip("Move speed of the character in m/s")]
         public float MoveSpeed = 2.0f;
@@ -155,8 +159,15 @@ namespace StarterAssets
         public SizePersonaje dePie;
         [Tooltip("Tamaño del jugador cuando está agachado")]
         public SizePersonaje agachado;
+        public bool estaVivo = true;
 
         public UnityEvent eventoEnGuardia;
+
+        #endregion
+
+        //////////////////////////////////////////////////////////////////////////////////
+        
+        #region CALLBACKS
 
         void OnEnable()
         {
@@ -167,137 +178,11 @@ namespace StarterAssets
             inputAtacar.action.canceled += ReiniciarAtaque;
         }
 
-        private void IniciarAtaque(InputAction.CallbackContext context)
-        {
-            // _animator.SetLayerWeight(1, 1f);
-            estaAtacando = true;
-            _animator.SetBool("atacando", true);
-        }
-
-
-        private void ReiniciarAtaque(InputAction.CallbackContext context)
-        {
-            estaAtacando = false;
-            // _animator.SetLayerWeight(1, 0f);
-            _animator.SetBool("atacando", false);
-        }
-
-        public void Atacar(int ataqueID)
-        {
-            Debug.Log("PERSONAJE ATACÓ! Clip n°: " + ataqueID);
-            if(controladorEquipo != null)
-            {
-                if(controladorEquipo.armaActual != null)
-                {
-                    if(controladorEquipo.armaActual.objetivoGolpeado != null)
-                    {
-                         Debug.Log("GOLPEE ALGO! Objeto: " + controladorEquipo.armaActual.objetivoGolpeado.name);
-                         controladorEquipo.armaActual.objetivoGolpeado.alSerGolpeado.Invoke();
-                    }
-                }
-            }
-        }
-
-        public void EstablecerLayerAtaque()
-        {
-            if (estaAtacando == true)
-            {
-                if (layerAtacando <= 1f)
-                    layerAtacando = layerAtacando + 2*Time.deltaTime;
-                else
-                    layerAtacando = 1f;
-            }
-            else
-            {
-                if(layerAtacando >= 0f)
-                    layerAtacando = layerAtacando - 2*Time.deltaTime;
-                else
-                    layerAtacando = 0f;
-            }
-
-            if(_speed > 0f)
-            {
-                _animator.SetLayerWeight(1, layerAtacando);
-
-                // layerAtacando = _animator.GetLayerWeight(2);
-                
-                // if(layerAtacando >= 0f)
-                //     layerAtacando -= 5*Time.deltaTime;
-                // else
-                //     layerAtacando = 0f;
-
-                // _animator.SetLayerWeight(2, layerAtacando);
-                _animator.SetLayerWeight(2, 0f);
-            }
-            else
-            {
-                _animator.SetLayerWeight(2, layerAtacando);
-
-                // layerAtacando = _animator.GetLayerWeight(1);
-
-                // if(layerAtacando > 0f)
-                //     layerAtacando -= 5*Time.deltaTime;
-                // else
-                //     layerAtacando = 0f;
-
-                // _animator.SetLayerWeight(1, layerAtacando);
-                _animator.SetLayerWeight(1, 0f);
-            }
-            
-        }
-
-
-        private void CancelarEnGuardia(InputAction.CallbackContext context)
-        {
-            estaEnGuardia = false;
-            _animator.SetBool("enGuardia", false);
-            estaAgachado = false;
-            _animator.SetBool("agacharse", false);
-        }
-
-
-        private void EstablecerEnGuardia(InputAction.CallbackContext context)
-        {
-            if(Grounded == true)
-            {
-                estaEnGuardia = true;
-                _animator.SetBool("enGuardia", true);
-            }    
-        }
-
-
         void OnDisable()
         {
             inputAgacharse.action.performed -= Agacharse;
             inputEnGuardia.action.performed -= EstablecerEnGuardia;
             inputEnGuardia.action.canceled -= CancelarEnGuardia;
-        }
-
-        public void MensajearConsola(string mensaje)
-        {
-            Debug.Log(mensaje);
-        }
-
-        private void Agacharse(InputAction.CallbackContext context)
-        {
-            Debug.Log("PRESIONE AGACHARSE");
-            if (Grounded == true && estaEnGuardia == false)
-            {
-                estaAgachado = !estaAgachado;
-
-                // Entregamos la estructura agachado o dePie
-                // dependiendo del valor de 'estaAgachado'
-                EstablecerSize(estaAgachado == true ? agachado : dePie);
-                
-                _animator.SetBool("agacharse", estaAgachado);
-            }
-        }
-
-        public void EstablecerSize(SizePersonaje newSize)
-        {
-            _controller.height = newSize.altura;
-            _controller.radius = newSize.ancho;
-            _controller.center = newSize.centro;
         }
 
         private void Awake()
@@ -333,20 +218,147 @@ namespace StarterAssets
         {
             _hasAnimator = TryGetComponent(out _animator);
 
-            JumpAndGravity();
-            GroundedCheck();
-            if (estaEnGuardia == false)
-                Move();
-            else
-                MoveARPG();
+            if(estaVivo == true)
+            {
+                JumpAndGravity();
+                GroundedCheck();
+                if (estaEnGuardia == false)
+                    Move();
+                else
+                    MoveARPG();
 
-            EstablecerLayerAtaque();
+                EstablecerLayerAtaque();
+            }
+            
         }
 
         private void LateUpdate()
         {
             CameraRotation();
         }
+        
+        #endregion
+
+        //////////////////////////////////////////////////////////////////////////////////
+        
+        #region METODOS
+
+        public void SetMovimiento0()
+        {
+            MoveSpeed = SprintSpeed = 0f;
+            estaVivo = false;
+        }
+
+        private void IniciarAtaque(InputAction.CallbackContext context)
+        {
+            estaAtacando = true;
+            _animator.SetBool("atacando", true);
+        }
+
+
+        private void ReiniciarAtaque(InputAction.CallbackContext context)
+        {
+            estaAtacando = false;
+            _animator.SetBool("atacando", false);
+        }
+
+        public void Atacar(int ataqueID)
+        {
+            Debug.Log("PERSONAJE ATACÓ! Clip n°: " + ataqueID);
+            if(controladorEquipo != null)
+            {
+                if(controladorEquipo.armaActual != null)
+                {
+                    if(controladorEquipo.armaActual.objetivoGolpeado != null)
+                    {
+                         Debug.Log("GOLPEE ALGO! Objeto: " + controladorEquipo.armaActual.objetivoGolpeado.name);
+                         if(controladorEquipo.armaActual.objetivoGolpeado.estaVivo == true)
+                            controladorEquipo.armaActual.objetivoGolpeado.alSerGolpeado.Invoke(controladorEquipo.armaActual.ataque);
+                    }
+                }
+            }
+        }
+
+        public void EstablecerLayerAtaque()
+        {
+            if (estaAtacando == true)
+            {
+                if (layerAtacando <= 1f)
+                    layerAtacando = layerAtacando + 2*Time.deltaTime;
+                else
+                    layerAtacando = 1f;
+            }
+            else
+            {
+                if(layerAtacando >= 0f)
+                    layerAtacando = layerAtacando - 2*Time.deltaTime;
+                else
+                    layerAtacando = 0f;
+            }
+
+            if(_speed > 0f)
+            {
+                _animator.SetLayerWeight(1, layerAtacando);
+                _animator.SetLayerWeight(2, 0f);
+            }
+            else
+            {
+                _animator.SetLayerWeight(2, layerAtacando);
+                _animator.SetLayerWeight(1, 0f);
+            }
+            
+        }
+
+
+        private void CancelarEnGuardia(InputAction.CallbackContext context)
+        {
+            estaEnGuardia = false;
+            _animator.SetBool("enGuardia", false);
+            estaAgachado = false;
+            _animator.SetBool("agacharse", false);
+        }
+
+
+        private void EstablecerEnGuardia(InputAction.CallbackContext context)
+        {
+            if(Grounded == true)
+            {
+                estaEnGuardia = true;
+                _animator.SetBool("enGuardia", true);
+            }    
+        }
+
+
+        
+
+        public void MensajearConsola(string mensaje)
+        {
+            Debug.Log(mensaje);
+        }
+
+        private void Agacharse(InputAction.CallbackContext context)
+        {
+            Debug.Log("PRESIONE AGACHARSE");
+            if (Grounded == true && estaEnGuardia == false)
+            {
+                estaAgachado = !estaAgachado;
+
+                // Entregamos la estructura agachado o dePie
+                // dependiendo del valor de 'estaAgachado'
+                EstablecerSize(estaAgachado == true ? agachado : dePie);
+                
+                _animator.SetBool("agacharse", estaAgachado);
+            }
+        }
+
+        public void EstablecerSize(SizePersonaje newSize)
+        {
+            _controller.height = newSize.altura;
+            _controller.radius = newSize.ancho;
+            _controller.center = newSize.centro;
+        }
+
+        
 
         private void AssignAnimationIDs()
         {
@@ -639,6 +651,12 @@ namespace StarterAssets
             }
         }
 
+        #endregion
+
+        //////////////////////////////////////////////////////////////////////////////////
+        
+        #region DEFINICIONES DATOS
+
         [System.Serializable]
         public struct SizePersonaje
         {
@@ -646,5 +664,9 @@ namespace StarterAssets
             public float ancho;
             public Vector3 centro;
         }
+
+        #endregion
+
+        //////////////////////////////////////////////////////////////////////////////////
     }
 }

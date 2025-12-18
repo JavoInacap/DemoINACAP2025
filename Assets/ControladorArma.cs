@@ -5,6 +5,8 @@ using UnityEngine;
 public class ControladorArma : MonoBehaviour
 {
     public ObjetivoGolpeable objetivoGolpeado;
+    // Cantidad de daño en ataque que hace el arma;
+    public float ataque = 10f;
 
     // Start is called before the first frame update
     void Start()
@@ -20,14 +22,15 @@ public class ControladorArma : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.tag == "ObjetivoGolpeable")
+        if(other.gameObject.GetComponent<ObjetivoGolpeable>())
         {
+            Debug.Log("ENCONTRE AL PLAYER");
             objetivoGolpeado =  other.gameObject.GetComponent<ObjetivoGolpeable>();
         }
     }
 
     void OnTriggerExit(Collider other)
     {
-        objetivoGolpeado = null;
+        //objetivoGolpeado = null;
     }
 }

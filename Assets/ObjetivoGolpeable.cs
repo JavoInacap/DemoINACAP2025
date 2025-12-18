@@ -5,7 +5,8 @@ using UnityEngine.Events;
 
 public class ObjetivoGolpeable : MonoBehaviour
 {
-    public UnityEvent alSerGolpeado;
+    public UnityEvent<float> alSerGolpeado;
+    public bool estaVivo = true;
     
     // Start is called before the first frame update
     void Start()
@@ -17,6 +18,11 @@ public class ObjetivoGolpeable : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void SetEstaVivo(bool nuevoEstado)
+    {
+        estaVivo = nuevoEstado;
     }
 
     public void LogPublico(string mensaje)
